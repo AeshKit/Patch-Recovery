@@ -16,9 +16,14 @@ jobs:
     - name: Check Out
       uses: actions/checkout@v4
 
+    - name: Set permissions
+      run: |
+        chmod +x magiskboot script1.sh script2.sh avbtool
+
     - name: Prepare the environment
       run: |
-        sudo apt install git wget lz4 tar openssl python3 -y
+        sudo apt update
+        sudo apt install -y git wget lz4 tar openssl python3 cpio lib32stdc++6
 
     - name: Fetch image from URL
       run: |
