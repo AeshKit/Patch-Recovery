@@ -56,11 +56,18 @@ jobs:
 
         python3 avbtool extract_public_key --key phh.pem --output phh.pub.bin
         
-        # Calculate partition size and round it up to a multiple of 4096 bytes
+        # Calculate partition size and round up to a multiple of 4096 bytes
         RAW_SIZE=$(wc -c < recovery.img)
         PART_SIZE=$(( (RAW_SIZE + 4095) / 4096 * 4096 ))
 
-        python3 avbtool add_hash_footer --partition_name recovery --partition_size $PART_SIZE --image recovery-patched.img --key phh.pem --algorithm SHA256_RSA4096
+        # Add hash footer with dynamic partition sizing enabled
+        python3 avbtool add_hash_footer \
+          --partition_name recovery \
+          --partition_size $PART_SIZE \
+          --dynamic_partition_size \
+          --image recovery-patched.img \
+          --key phh.pem \
+          --algorithm SHA256_RSA4096
         
         mkdir -p output && cd output
         mv ../recovery-patched.img recovery.img
