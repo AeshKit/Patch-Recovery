@@ -18,19 +18,23 @@ jobs:
 
     - name: Fix Line Endings and Permissions
       run: |
-        # Convert CRLF to LF for all shell scripts so Linux can parse them correctly
-        sed -i -e 's/\r$//' script1.sh script2.sh magiskboot avbtool 2>/dev/null || true
-        chmod +x magiskboot script1.sh script2.sh avbtool
+        sed -i -e 's/\r$//' script1.sh script2.sh avbtool 2>/dev/null || true
+        chmod +x script1.sh script2.sh avbtool
 
-    - name: Prepare the environment
+    - name: Prepare the environment and fetch latest magiskboot
       run: |
         sudo apt update
-        sudo apt install -y git wget lz4 tar openssl python3 cpio lib32stdc++6
+        sudo apt install -y git wget lz4 tar openssl python3 cpio lib32stdc++6 unzip
+        
+        # Download the latest Magisk release zip to extract a fresh, compatible magiskboot binary
+        wget https://github.com/topjohnwu/Magisk/releases/download/v27.0/Magisk-v27.0.apk -O magisk.zip
+        unzip -o magisk.zip 'lib/x86_64/libmagiskboot.so'
+        mv lib/x86_64/libmagiskboot.so ./magiskboot
+        chmod +x magiskboot
+        rm -rf magisk.zip lib
 
     - name: Fetch image from URL
       run: |
-        ls -la
-        pwd
         wget "${{ github.event.inputs.RECOVERY_URL }}" -O recovery.img
 
     - name: Patch Process-1
